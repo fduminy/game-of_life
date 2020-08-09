@@ -23,6 +23,8 @@ class DefaultGameChangerTest {
     @Mock
     private Game game;
     @Mock
+    private GameEvolution gameEvolution;
+    @Mock
     private BiFunction<Integer, Integer, CellView> cellViewSupplier;
     @Mock
     private CellView cellView;
@@ -36,16 +38,16 @@ class DefaultGameChangerTest {
         when(cellViewSupplier.apply(anyInt(), anyInt())).thenReturn(cellView);
         when(rule.evolve(cellView)).thenReturn(cellIsAliveAfter);
 
-        new DefaultGameChanger().evolve(game, cellViewSupplier, rule);
+        new DefaultGameChanger().evolve(game, gameEvolution, cellViewSupplier, rule);
 
         verify(game).getSize();
         verify(rule, times(NUMBER_OF_CELLS)).evolve(cellView);
-        verify(game, times(NUMBER_OF_CELLS)).setAlive(anyInt(), anyInt(), eq(cellIsAliveAfter));
+        verify(gameEvolution, times(NUMBER_OF_CELLS)).setAlive(anyInt(), anyInt(), eq(cellIsAliveAfter));
         for (int y = 0; y < GAME_SIZE; y++) {
             for (int x = 0; x < GAME_SIZE; x++) {
                 verify(cellViewSupplier).apply(x, y);
             }
         }
-        verifyNoMoreInteractions(game, cellViewSupplier, cellView, rule);
+        verifyNoMoreInteractions(game, gameEvolution, cellViewSupplier, cellView, rule);
     }
 }
