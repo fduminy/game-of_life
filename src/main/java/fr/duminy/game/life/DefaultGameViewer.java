@@ -23,10 +23,7 @@ public class DefaultGameViewer implements GameViewer {
     @Override
     public void view(Game game) {
         int gameSize = game.getSize();
-        if (image == null) {
-            label = initView(gameSize);
-        }
-
+        initViewIfNotDone(gameSize);
         for (int y = 0; y < gameSize; y++) {
             for (int x = 0; x < gameSize; x++) {
                 boolean alive = game.isAlive(x, y);
@@ -36,11 +33,15 @@ public class DefaultGameViewer implements GameViewer {
         label.repaint();
     }
 
-    private JLabel initView(int gameSize) {
+    private void initViewIfNotDone(int gameSize) {
+        if (window != null) {
+            return;
+        }
+
         image = new BufferedImage(gameSize, gameSize, TYPE_BYTE_GRAY);
 
         ImageIcon imageIcon = new ImageIcon(image);
-        JLabel label = new JLabel(imageIcon);
+        label = new JLabel(imageIcon);
         window = new JFrame("Game of life");
         window.setContentPane(label);
         window.pack();
@@ -53,6 +54,5 @@ public class DefaultGameViewer implements GameViewer {
                 gameLoop.stop();
             }
         });
-        return label;
     }
 }
