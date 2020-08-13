@@ -14,6 +14,12 @@
     </properties>
 
     <dependencies>
+        <dependency>
+            <groupId>com.google.code.tempus-fugit</groupId>
+            <artifactId>tempus-fugit</artifactId>
+            <version>1.1</version>
+        </dependency>
+
         <!-- test frameworks -->
         <dependency>
             <groupId>org.junit.jupiter</groupId>

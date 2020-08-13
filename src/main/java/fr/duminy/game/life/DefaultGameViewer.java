@@ -1,6 +1,8 @@
 package fr.duminy.game.life;
 
 import javax.swing.*;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 import java.awt.image.BufferedImage;
 
 import static java.awt.Color.BLACK;
@@ -9,10 +11,13 @@ import static java.awt.image.BufferedImage.TYPE_BYTE_GRAY;
 import static javax.swing.WindowConstants.DISPOSE_ON_CLOSE;
 
 public class DefaultGameViewer implements GameViewer {
+    JFrame window;
+    private final GameLoop gameLoop;
     private JLabel label;
     private BufferedImage image;
 
-    public DefaultGameViewer() {
+    public DefaultGameViewer(GameLoop gameLoop) {
+        this.gameLoop = gameLoop;
     }
 
     @Override
@@ -36,12 +41,18 @@ public class DefaultGameViewer implements GameViewer {
 
         ImageIcon imageIcon = new ImageIcon(image);
         JLabel label = new JLabel(imageIcon);
-        JFrame frame = new JFrame("Game of life");
-        frame.setContentPane(label);
-        frame.pack();
-        frame.setSize(frame.getPreferredSize());
-        frame.setDefaultCloseOperation(DISPOSE_ON_CLOSE);
-        frame.setVisible(true);
+        window = new JFrame("Game of life");
+        window.setContentPane(label);
+        window.pack();
+        window.setSize(window.getPreferredSize());
+        window.setDefaultCloseOperation(DISPOSE_ON_CLOSE);
+        window.setVisible(true);
+        window.addWindowListener(new WindowAdapter() {
+            @Override
+            public void windowClosing(WindowEvent e) {
+                gameLoop.stop();
+            }
+        });
         return label;
     }
 }
