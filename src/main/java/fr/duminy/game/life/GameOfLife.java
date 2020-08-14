@@ -25,8 +25,9 @@ public class GameOfLife {
         Rule rule = new DefaultRule();
         BiFunction<Integer, Integer, CellView> cellViewSupplier = new DefaultCellViewSupplier(game);
         Sleeper sleeper = new ThreadSleep(millis(40));
+        GameInitializer gameInitializer = new DefaultGameInitializer();
 
-        gameLoop = new DefaultGameLoop(game, DefaultGameViewer::new, gameChanger, gameEvolution, rule, cellViewSupplier, sleeper);
+        gameLoop = new DefaultGameLoop(game, DefaultGameViewer::new, gameChanger, gameEvolution, rule, cellViewSupplier, sleeper, gameInitializer);
     }
 
     void start() throws InterruptedException {

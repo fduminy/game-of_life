@@ -9,7 +9,6 @@ import java.util.function.BiFunction;
 import java.util.function.Function;
 
 import static com.google.code.tempusfugit.temporal.Duration.seconds;
-import static java.lang.Math.random;
 
 public class DefaultGameLoop implements GameLoop {
     static final Duration DELAY = seconds(1);
@@ -22,8 +21,11 @@ public class DefaultGameLoop implements GameLoop {
     private final BiFunction<Integer, Integer, CellView> cellViewSupplier;
     private final AtomicReference<GameLoopThread> gameLoopThread = new AtomicReference<>();
     private final Sleeper sleeper;
+    private final GameInitializer gameInitializer;
 
-    public DefaultGameLoop(Game game, Function<GameLoop, GameViewer> gameViewer, DefaultGameChanger gameChanger, GameEvolution gameEvolution, Rule rule, BiFunction<Integer, Integer, CellView> cellViewSupplier, Sleeper sleeper) {
+    public DefaultGameLoop(Game game, Function<GameLoop, GameViewer> gameViewer, DefaultGameChanger gameChanger,
+                           GameEvolution gameEvolution, Rule rule, BiFunction<Integer, Integer, CellView> cellViewSupplier,
+                           Sleeper sleeper, GameInitializer gameInitializer) {
         this.game = game;
         this.gameViewer = gameViewer.apply(this);
         this.gameChanger = gameChanger;
@@ -31,6 +33,7 @@ public class DefaultGameLoop implements GameLoop {
         this.rule = rule;
         this.cellViewSupplier = cellViewSupplier;
         this.sleeper = sleeper;
+        this.gameInitializer = gameInitializer;
     }
 
     @Override
@@ -64,7 +67,7 @@ public class DefaultGameLoop implements GameLoop {
 
         @Override
         public void run() {
-            initGame(game);
+            gameInitializer.initialize(game);
             gameViewer.view(game);
 
             while (!stop.get()) {
@@ -81,15 +84,6 @@ public class DefaultGameLoop implements GameLoop {
 
         void requestStop() {
             stop.set(true);
-        }
-
-        private void initGame(Game game) {
-            int size = game.getSize();
-            for (int y = 0; y < size; y++) {
-                for (int x = 0; x < size; x++) {
-                    game.setAlive(x, y, random() > 0.5);
-                }
-            }
         }
     }
 }
