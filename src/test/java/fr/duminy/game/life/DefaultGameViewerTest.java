@@ -2,15 +2,17 @@ package fr.duminy.game.life;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InOrder;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.awt.event.WindowEvent;
 
 import static fr.duminy.game.life.DefaultCellViewTest.GAME_SIZE;
+import static fr.duminy.game.life.DefaultGameChangerTest.NUMBER_OF_CELLS;
+import static fr.duminy.game.life.Mocks.stubCellIterator;
 import static java.awt.event.WindowEvent.WINDOW_CLOSING;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.verifyNoMoreInteractions;
+import static org.mockito.Mockito.inOrder;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
@@ -23,18 +25,23 @@ class DefaultGameViewerTest {
     @Test
     void view() {
         when(game.getSize()).thenReturn(GAME_SIZE);
+        CellIterator cellIterator = stubCellIterator(game);
         DefaultGameViewer gameViewer = new DefaultGameViewer(gameLoop);
 
         gameViewer.view(game);
 
-        verify(game).getSize();
-        for (int y = 0; y < GAME_SIZE; y++) {
-            for (int x = 0; x < GAME_SIZE; x++) {
-                verify(game).isAlive(x, y);
-            }
+        InOrder inOrder = inOrder(game, gameLoop, cellIterator);
+        inOrder.verify(game).iterator();
+        inOrder.verify(cellIterator).hasNext();
+        for (int i = 0; i < NUMBER_OF_CELLS; i++) {
+            inOrder.verify(cellIterator).isAlive();
+            inOrder.verify(cellIterator).getX();
+            inOrder.verify(cellIterator).getY();
+            inOrder.verify(cellIterator).next();
+            inOrder.verify(cellIterator).hasNext();
         }
         gameViewer.window.dispatchEvent(new WindowEvent(gameViewer.window, WINDOW_CLOSING));
-        verify(gameLoop).stop();
-        verifyNoMoreInteractions(game, gameLoop);
+        inOrder.verify(gameLoop).stop();
+        inOrder.verifyNoMoreInteractions();
     }
 }

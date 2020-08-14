@@ -3,7 +3,7 @@ package fr.duminy.game.life;
 import com.google.code.tempusfugit.temporal.Sleeper;
 import com.google.code.tempusfugit.temporal.ThreadSleep;
 
-import java.util.function.BiFunction;
+import java.util.function.Function;
 
 import static com.google.code.tempusfugit.temporal.Duration.millis;
 import static java.lang.Thread.sleep;
@@ -23,7 +23,7 @@ public class GameOfLife {
         DefaultGameChanger gameChanger = new DefaultGameChanger();
         GameEvolution gameEvolution = new DefaultGameEvolution();
         Rule rule = new DefaultRule();
-        BiFunction<Integer, Integer, CellView> cellViewSupplier = new DefaultCellViewSupplier(game);
+        Function<CellIterator, CellView> cellViewSupplier = new DefaultCellViewSupplier(game);
         Sleeper sleeper = new ThreadSleep(millis(40));
         GameInitializer gameInitializer = new DefaultGameInitializer();
 

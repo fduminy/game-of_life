@@ -30,6 +30,11 @@ public class DefaultGame implements Game {
         }
     }
 
+    @Override
+    public CellIterator iterator() {
+        return new DefaultCellIterator(this);
+    }
+
     private int index(int x, int y) {
         return x + y * size;
     }

@@ -1,14 +1,11 @@
 package fr.duminy.game.life;
 
-import java.util.function.BiFunction;
+import java.util.function.Function;
 
 public class DefaultGameChanger implements GameChanger {
-    void evolve(Game game, GameEvolution gameEvolution, BiFunction<Integer, Integer, CellView> cellViewSupplier, Rule rule) {
-        int size = game.getSize();
-        for (int y = 0; y < size; y++) {
-            for (int x = 0; x < size; x++) {
-                gameEvolution.setAlive(x, y, rule.evolve(cellViewSupplier.apply(x, y)));
-            }
+    void evolve(Game game, GameEvolution gameEvolution, Function<CellIterator, CellView> cellViewSupplier, Rule rule) {
+        for (CellIterator cellIterator = game.iterator(); cellIterator.hasNext(); cellIterator.next()) {
+            gameEvolution.setAlive(cellIterator.getX(), cellIterator.getY(), rule.evolve(cellViewSupplier.apply(cellIterator)));
         }
     }
 }

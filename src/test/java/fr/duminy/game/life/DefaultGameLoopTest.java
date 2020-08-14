@@ -12,7 +12,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.TimeoutException;
 import java.util.concurrent.atomic.AtomicInteger;
-import java.util.function.BiFunction;
+import java.util.function.Function;
 
 import static com.google.code.tempusfugit.temporal.Duration.seconds;
 import static com.google.code.tempusfugit.temporal.Timeout.timeout;
@@ -33,7 +33,7 @@ class DefaultGameLoopTest {
     @Mock
     private Rule rule;
     @Mock
-    private BiFunction<Integer, Integer, CellView> cellViewSupplier;
+    private Function<CellIterator, CellView> cellViewSupplier;
     @Mock
     private Sleeper sleeper;
     @Mock

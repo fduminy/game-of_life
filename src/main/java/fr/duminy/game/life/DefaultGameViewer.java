@@ -24,11 +24,9 @@ public class DefaultGameViewer implements GameViewer {
     public void view(Game game) {
         int gameSize = game.getSize();
         initViewIfNotDone(gameSize);
-        for (int y = 0; y < gameSize; y++) {
-            for (int x = 0; x < gameSize; x++) {
-                boolean alive = game.isAlive(x, y);
-                image.setRGB(x, y, alive ? WHITE.getRGB() : BLACK.getRGB());
-            }
+        for (CellIterator cellIterator = game.iterator(); cellIterator.hasNext(); cellIterator.next()) {
+            boolean alive = cellIterator.isAlive();
+            image.setRGB(cellIterator.getX(), cellIterator.getY(), alive ? WHITE.getRGB() : BLACK.getRGB());
         }
         label.repaint();
     }

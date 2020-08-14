@@ -5,7 +5,6 @@ import com.google.code.tempusfugit.temporal.Sleeper;
 
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicReference;
-import java.util.function.BiFunction;
 import java.util.function.Function;
 
 import static com.google.code.tempusfugit.temporal.Duration.seconds;
@@ -18,13 +17,13 @@ public class DefaultGameLoop implements GameLoop {
     private final DefaultGameChanger gameChanger;
     private final GameEvolution gameEvolution;
     private final Rule rule;
-    private final BiFunction<Integer, Integer, CellView> cellViewSupplier;
+    private final Function<CellIterator, CellView> cellViewSupplier;
     private final AtomicReference<GameLoopThread> gameLoopThread = new AtomicReference<>();
     private final Sleeper sleeper;
     private final GameInitializer gameInitializer;
 
     public DefaultGameLoop(Game game, Function<GameLoop, GameViewer> gameViewer, DefaultGameChanger gameChanger,
-                           GameEvolution gameEvolution, Rule rule, BiFunction<Integer, Integer, CellView> cellViewSupplier,
+                           GameEvolution gameEvolution, Rule rule, Function<CellIterator, CellView> cellViewSupplier,
                            Sleeper sleeper, GameInitializer gameInitializer) {
         this.game = game;
         this.gameViewer = gameViewer.apply(this);

@@ -3,17 +3,17 @@ package fr.duminy.game.life;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
+import org.mockito.InOrder;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import java.util.function.BiFunction;
+import java.util.function.Function;
 
 import static fr.duminy.game.life.DefaultCellViewTest.GAME_SIZE;
+import static fr.duminy.game.life.Mocks.stubCellIterator;
 import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.verifyNoMoreInteractions;
+import static org.mockito.Mockito.inOrder;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
@@ -25,7 +25,7 @@ class DefaultGameChangerTest {
     @Mock
     private GameEvolution gameEvolution;
     @Mock
-    private BiFunction<Integer, Integer, CellView> cellViewSupplier;
+    private Function<CellIterator, CellView> cellViewSupplier;
     @Mock
     private CellView cellView;
     @Mock
@@ -34,20 +34,22 @@ class DefaultGameChangerTest {
     @ParameterizedTest(name = "cell isAlive={0} after")
     @ValueSource(booleans = {true, false})
     void evolve(boolean cellIsAliveAfter) {
-        when(game.getSize()).thenReturn(GAME_SIZE);
-        when(cellViewSupplier.apply(anyInt(), anyInt())).thenReturn(cellView);
+        CellIterator cellIterator = stubCellIterator(game);
+        when(cellViewSupplier.apply(cellIterator)).thenReturn(cellView);
         when(rule.evolve(cellView)).thenReturn(cellIsAliveAfter);
 
         new DefaultGameChanger().evolve(game, gameEvolution, cellViewSupplier, rule);
 
-        verify(game).getSize();
-        verify(rule, times(NUMBER_OF_CELLS)).evolve(cellView);
-        verify(gameEvolution, times(NUMBER_OF_CELLS)).setAlive(anyInt(), anyInt(), eq(cellIsAliveAfter));
-        for (int y = 0; y < GAME_SIZE; y++) {
-            for (int x = 0; x < GAME_SIZE; x++) {
-                verify(cellViewSupplier).apply(x, y);
-            }
+        InOrder inOrder = inOrder(game, gameEvolution, cellViewSupplier, cellView, rule, cellIterator);
+        inOrder.verify(game).iterator();
+        inOrder.verify(cellIterator).hasNext();
+        for (int i = 0; i < NUMBER_OF_CELLS; i++) {
+            inOrder.verify(cellViewSupplier).apply(cellIterator);
+            inOrder.verify(rule).evolve(cellView);
+            inOrder.verify(gameEvolution).setAlive(anyInt(), anyInt(), eq(cellIsAliveAfter));
+            inOrder.verify(cellIterator).next();
+            inOrder.verify(cellIterator).hasNext();
         }
-        verifyNoMoreInteractions(game, gameEvolution, cellViewSupplier, cellView, rule);
+        inOrder.verifyNoMoreInteractions();
     }
 }
