@@ -1,13 +1,13 @@
 package fr.duminy.game.life;
 
 public class DefaultCellIterator implements CellIterator {
-    private final Game game;
+    private final GameModel game;
     private int index;
     private int x;
     private int y;
     private int numberOfCells;
 
-    public DefaultCellIterator(Game game) {
+    public DefaultCellIterator(GameModel game) {
         this.game = game;
         numberOfCells = game.getSize() * game.getSize();
     }

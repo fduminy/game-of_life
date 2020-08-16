@@ -58,7 +58,7 @@ class DefaultGameLoopTest {
             return null;
         }).when(sleeper).sleep();
         doAnswer(a -> events.add("evolve")).when(gameChanger).evolve(game, gameEvolution, cellViewSupplier, rule);
-        doAnswer(a -> events.add("update")).when(gameEvolution).update(game);
+        doAnswer(a -> events.add("update")).when(gameEvolution).update();
 
         gameLoop.start();
         waitOrTimeout(() -> sleepCount.get() >= maxIterations, timeout(seconds(1)));

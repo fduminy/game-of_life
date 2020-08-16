@@ -3,52 +3,50 @@ package fr.duminy.game.life;
 import net.jqwik.api.ForAll;
 import net.jqwik.api.Property;
 import net.jqwik.api.constraints.IntRange;
-import org.assertj.core.api.SoftAssertions;
-import org.assertj.core.api.junit.jupiter.SoftAssertionsExtension;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
 
 import static fr.duminy.game.life.DefaultCellViewTest.GAME_SIZE;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
-@ExtendWith(SoftAssertionsExtension.class)
 class DefaultGameTest {
     @Property
     void getSize() {
-        assertThat(new DefaultGame(GAME_SIZE).getSize()).isEqualTo(GAME_SIZE);
+        GameModel gameModel = mock(GameModel.class);
+        when(gameModel.getSize()).thenReturn(GAME_SIZE);
+        assertThat(new DefaultGame(gameModel).getSize()).isEqualTo(GAME_SIZE);
     }
 
     @Property
-    void isAlive_returns_false_with_default_constructor(@ForAll @IntRange(max = GAME_SIZE - 1) int x, @ForAll @IntRange(max = GAME_SIZE - 1) int y) {
-        assertThat(new DefaultGame(GAME_SIZE).isAlive(x, y)).isFalse();
+    void isAlive(@ForAll @IntRange(max = GAME_SIZE - 1) int x, @ForAll @IntRange(max = GAME_SIZE - 1) int y) {
+        GameModel gameModel = mock(GameModel.class);
+        DefaultGame game = new DefaultGame(gameModel);
+
+        game.isAlive(x, y);
+
+        verify(gameModel).isAlive(x, y);
     }
 
     @Property
-    void isAlive_returns_value_given_to_setAlive(@ForAll @IntRange(max = GAME_SIZE - 1) int x, @ForAll @IntRange(max = GAME_SIZE - 1) int y,
-                                                 @ForAll boolean alive) {
-        DefaultGame game = new DefaultGame(GAME_SIZE);
+    void setAlive(@ForAll @IntRange(max = GAME_SIZE - 1) int x, @ForAll @IntRange(max = GAME_SIZE - 1) int y,
+                  @ForAll boolean alive) {
+        GameModel gameModel = mock(GameModel.class);
+        DefaultGame game = new DefaultGame(gameModel);
+
         game.setAlive(x, y, alive);
-        assertThat(game.isAlive(x, y)).isEqualTo(alive);
+
+        verify(gameModel).setAlive(x, y, alive);
     }
 
     @Test
-    void iterator(SoftAssertions softly) {
-        DefaultGame game = new DefaultGame(GAME_SIZE);
+    void iterator() {
+        GameModel gameModel = mock(GameModel.class);
+        CellIterator cellIterator = mock(CellIterator.class);
+        when(gameModel.iterator()).thenReturn(cellIterator);
+        DefaultGame game = new DefaultGame(gameModel);
 
-        CellIterator cellIterator1 = game.iterator();
-        CellIterator cellIterator2 = game.iterator();
-
-        assertIterator(softly, cellIterator1);
-        assertIterator(softly, cellIterator2);
-        softly.assertThat(cellIterator2).isNotSameAs(cellIterator1);
-    }
-
-    private void assertIterator(SoftAssertions softly, CellIterator cellIterator) {
-        softly.assertThat(cellIterator).isExactlyInstanceOf(DefaultCellIterator.class);
-        if (softly.wasSuccess()) {
-            softly.assertThat(cellIterator.getX()).isZero();
-            softly.assertThat(cellIterator.getY()).isZero();
-            softly.assertThat(cellIterator.getIndex()).isZero();
-        }
+        assertThat(game.iterator()).isSameAs(cellIterator);
     }
 }

@@ -1,41 +1,29 @@
 package fr.duminy.game.life;
 
-import java.util.BitSet;
-
 public class DefaultGame implements Game {
-    private final int size;
-    private final BitSet alive;
+    private final GameModel gameModel;
 
-    public DefaultGame(int size) {
-        this.size = size;
-        alive = new BitSet(size * size);
+    public DefaultGame(GameModel gameModel) {
+        this.gameModel = gameModel;
     }
 
     @Override
     public int getSize() {
-        return size;
+        return gameModel.getSize();
     }
 
     @Override
     public boolean isAlive(int x, int y) {
-        return alive.get(index(x, y));
+        return gameModel.isAlive(x, y);
     }
 
     @Override
     public void setAlive(int x, int y, boolean alive) {
-        if (alive) {
-            this.alive.set(index(x, y));
-        } else {
-            this.alive.clear(index(x, y));
-        }
+        gameModel.setAlive(x, y, alive);
     }
 
     @Override
     public CellIterator iterator() {
-        return new DefaultCellIterator(this);
-    }
-
-    private int index(int x, int y) {
-        return x + y * size;
+        return gameModel.iterator();
     }
 }

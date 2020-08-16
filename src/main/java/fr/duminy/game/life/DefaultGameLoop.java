@@ -76,7 +76,7 @@ public class DefaultGameLoop implements GameLoop {
                     throw new RuntimeException(e);
                 }
                 gameChanger.evolve(game, gameEvolution, cellViewSupplier, rule);
-                gameEvolution.update(game);
+                gameEvolution.update();
                 gameViewer.view(game);
             }
         }

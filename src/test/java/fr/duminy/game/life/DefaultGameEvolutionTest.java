@@ -12,47 +12,36 @@ import net.jqwik.api.constraints.Size;
 import net.jqwik.api.stateful.Action;
 import net.jqwik.api.stateful.ActionSequence;
 
+import java.util.List;
+
 import static fr.duminy.game.life.DefaultCellViewTest.GAME_SIZE;
 import static java.lang.String.format;
+import static java.util.stream.Collectors.toList;
 import static net.jqwik.api.Arbitraries.integers;
 import static net.jqwik.api.Combinators.combine;
-import static org.mockito.Mockito.atLeast;
-import static org.mockito.Mockito.clearInvocations;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.verifyNoInteractions;
+import static org.mockito.Mockito.when;
 
 class DefaultGameEvolutionTest {
     @Property
-    void update_should_not_update_the_game_when_setAlive_is_never_called() {
-        Game game = mock(Game.class);
-
-        new DefaultGameEvolution().update(game);
-
-        verifyNoInteractions(game);
-    }
-
-    @Property
     void update_should_update_the_game(@ForAll("sequences") @Size(max = 10) ActionSequence<DefaultGameEvolution> actions) {
         Game game = mock(Game.class);
-        DefaultGameEvolution gameEvolution = actions.run(new DefaultGameEvolution());
+        when(game.getSize()).thenReturn(GAME_SIZE);
+        DefaultGameEvolution gameEvolution = actions.run(new DefaultGameEvolution(game));
 
-        gameEvolution.update(game);
+        gameEvolution.update();
 
-        actions.runActions().stream().filter(SetAliveAction.class::isInstance).map(SetAliveAction.class::cast)
-                .forEach(setAliveAction -> verify(game, atLeast(1)).setAlive(setAliveAction.x, setAliveAction.y, setAliveAction.alive));
-    }
-
-    @Property
-    void update_should_clear_updates_after_each_call(@ForAll("sequences") @Size(max = 1) ActionSequence<DefaultGameEvolution> actions) {
-        Game game = mock(Game.class);
-        DefaultGameEvolution gameEvolution = actions.run(new DefaultGameEvolution());
-
-        gameEvolution.update(game); // should clear updates
-        clearInvocations(game);
-        gameEvolution.update(game);
-
-        verifyNoInteractions(game);
+        for (int y = 0; y < GAME_SIZE; y++) {
+            for (int x = 0; x < GAME_SIZE; x++) {
+                final int currentX = x;
+                final int currentY = y;
+                List<SetAliveAction> currentActions = actions.runActions().stream().filter(SetAliveAction.class::isInstance).map(SetAliveAction.class::cast)
+                        .filter(action -> (action.x == currentX) && (action.y == currentY)).collect(toList());
+                boolean alive = !currentActions.isEmpty() && currentActions.get(currentActions.size() - 1).alive;
+                verify(game).setAlive(x, y, alive);
+            }
+        }
     }
 
     @SuppressWarnings("unused")

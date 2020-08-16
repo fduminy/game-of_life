@@ -19,9 +19,10 @@ public class GameOfLife {
     private final GameLoop gameLoop;
 
     GameOfLife() {
-        Game game = new DefaultGame(1000);
+        GameModel gameModel = new DefaultGameModel(1000);
+        Game game = new DefaultGame(gameModel);
         DefaultGameChanger gameChanger = new DefaultGameChanger();
-        GameEvolution gameEvolution = new DefaultGameEvolution();
+        GameEvolution gameEvolution = new DefaultGameEvolution(game);
         Rule rule = new DefaultRule();
         Function<CellIterator, CellView> cellViewSupplier = new DefaultCellViewSupplier(game);
         Sleeper sleeper = new ThreadSleep(millis(40));
