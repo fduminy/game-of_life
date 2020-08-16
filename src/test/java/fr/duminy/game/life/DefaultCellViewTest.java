@@ -1,6 +1,5 @@
 package fr.duminy.game.life;
 
-import fr.duminy.game.life.CellView.Position;
 import org.assertj.core.api.SoftAssertions;
 import org.assertj.core.api.junit.jupiter.SoftAssertionsExtension;
 import org.junit.jupiter.api.DisplayName;
@@ -13,15 +12,15 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.mockito.stubbing.Answer;
 
-import static fr.duminy.game.life.CellView.Position.BOTTOM;
-import static fr.duminy.game.life.CellView.Position.BOTTOM_LEFT;
-import static fr.duminy.game.life.CellView.Position.BOTTOM_RIGHT;
-import static fr.duminy.game.life.CellView.Position.LEFT;
-import static fr.duminy.game.life.CellView.Position.RIGHT;
-import static fr.duminy.game.life.CellView.Position.TOP;
-import static fr.duminy.game.life.CellView.Position.TOP_LEFT;
-import static fr.duminy.game.life.CellView.Position.TOP_RIGHT;
-import static fr.duminy.game.life.CellView.Position.values;
+import static fr.duminy.game.life.DefaultCellViewTest.Position.BOTTOM;
+import static fr.duminy.game.life.DefaultCellViewTest.Position.BOTTOM_LEFT;
+import static fr.duminy.game.life.DefaultCellViewTest.Position.BOTTOM_RIGHT;
+import static fr.duminy.game.life.DefaultCellViewTest.Position.LEFT;
+import static fr.duminy.game.life.DefaultCellViewTest.Position.RIGHT;
+import static fr.duminy.game.life.DefaultCellViewTest.Position.TOP;
+import static fr.duminy.game.life.DefaultCellViewTest.Position.TOP_LEFT;
+import static fr.duminy.game.life.DefaultCellViewTest.Position.TOP_RIGHT;
+import static fr.duminy.game.life.DefaultCellViewTest.Position.values;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.Mockito.mock;
@@ -42,7 +41,7 @@ public class DefaultCellViewTest {
         when(game.isAlive(anyInt(), anyInt())).thenReturn(false);
         when(game.getSize()).thenReturn(GAME_SIZE);
         CellView view = new DefaultCellView(game, 1, 1);
-        assertThat(view.isAlive(targetCell)).as("at targetCell %s", targetCell).isFalse();
+        assertThat(isAlive(view, targetCell)).as("at targetCell %s", targetCell).isFalse();
     }
 
     @ParameterizedTest
@@ -51,17 +50,49 @@ public class DefaultCellViewTest {
         when(game.isAlive(anyInt(), anyInt())).thenReturn(true);
         when(game.getSize()).thenReturn(GAME_SIZE);
         CellView view = new DefaultCellView(game, 1, 1);
-        assertThat(view.isAlive(targetCell)).as("at targetCell %s", targetCell).isTrue();
+        assertThat(isAlive(view, targetCell)).as("at targetCell %s", targetCell).isTrue();
     }
 
     @ParameterizedTest
     @EnumSource(Position.class)
     void isAlive_should_return_true_only_when_target_cell_is_alive(Position targetCell, SoftAssertions softly) {
-        when(game.isAlive(anyInt(), anyInt())).then(returnsTrueIf(targetCell));
+        int x = 1;
+        int y = 1;
+        when(game.isAlive(anyInt(), anyInt())).then(returnsTrueIf(targetCell, x, y));
         when(game.getSize()).thenReturn(GAME_SIZE);
-        CellView view = new DefaultCellView(game, 1, 1);
+        CellView view = new DefaultCellView(game, x, y);
         for (Position testedCell : values()) {
-            softly.assertThat(view.isAlive(testedCell)).as("at testedCell %s", testedCell).isEqualTo(targetCell == testedCell);
+            softly.assertThat(isAlive(view, testedCell)).as("at testedCell %s", testedCell).isEqualTo(targetCell == testedCell);
+        }
+    }
+
+    enum Position {
+        TOP_LEFT(-1, -1),
+        TOP(0, -1),
+        TOP_RIGHT(1, -1),
+
+        LEFT(-1, 0),
+        CENTER(0, 0),
+        RIGHT(1, 0),
+
+        BOTTOM_LEFT(-1, 1),
+        BOTTOM(0, 1),
+        BOTTOM_RIGHT(1, 1);
+
+        private final int deltaX;
+        private final int deltaY;
+
+        Position(int deltaX, int deltaY) {
+            this.deltaX = deltaX;
+            this.deltaY = deltaY;
+        }
+
+        public int getDeltaX() {
+            return deltaX;
+        }
+
+        public int getDeltaY() {
+            return deltaY;
         }
     }
 
@@ -75,7 +106,7 @@ public class DefaultCellViewTest {
             Game game = gameWithAllCellsAlive();
             for (int y = 0; y < GAME_SIZE; y++) {
                 CellView view = new DefaultCellView(game, 0, y);
-                softly.assertThat(view.isAlive(LEFT)).as("y=%d", y).isFalse();
+                softly.assertThat(isAlive(view, LEFT)).as("y=%d", y).isFalse();
             }
         }
 
@@ -84,7 +115,7 @@ public class DefaultCellViewTest {
             Game game = gameWithAllCellsAlive();
             for (int y = 0; y < GAME_SIZE; y++) {
                 CellView view = new DefaultCellView(game, X_MAX, y);
-                softly.assertThat(view.isAlive(RIGHT)).as("y=%d", y).isFalse();
+                softly.assertThat(isAlive(view, RIGHT)).as("y=%d", y).isFalse();
             }
         }
 
@@ -93,7 +124,7 @@ public class DefaultCellViewTest {
             Game game = gameWithAllCellsAlive();
             for (int x = 0; x < GAME_SIZE; x++) {
                 CellView view = new DefaultCellView(game, x, 0);
-                softly.assertThat(view.isAlive(TOP)).as("x=%d", x).isFalse();
+                softly.assertThat(isAlive(view, TOP)).as("x=%d", x).isFalse();
             }
         }
 
@@ -102,17 +133,17 @@ public class DefaultCellViewTest {
             Game game = gameWithAllCellsAlive();
             for (int x = 0; x < GAME_SIZE; x++) {
                 CellView view = new DefaultCellView(game, x, Y_MAX);
-                softly.assertThat(view.isAlive(BOTTOM)).as("x=%d", x).isFalse();
+                softly.assertThat(isAlive(view, BOTTOM)).as("x=%d", x).isFalse();
             }
         }
 
         @Test
         void on_corner_side(SoftAssertions softly) {
             Game game = gameWithAllCellsAlive();
-            softly.assertThat(new DefaultCellView(game, 0, 0).isAlive(TOP_LEFT)).isFalse();
-            softly.assertThat(new DefaultCellView(game, X_MAX, 0).isAlive(TOP_RIGHT)).isFalse();
-            softly.assertThat(new DefaultCellView(game, X_MAX, Y_MAX).isAlive(BOTTOM_RIGHT)).isFalse();
-            softly.assertThat(new DefaultCellView(game, 0, Y_MAX).isAlive(BOTTOM_LEFT)).isFalse();
+            softly.assertThat(isAlive(new DefaultCellView(game, 0, 0), TOP_LEFT)).isFalse();
+            softly.assertThat(isAlive(new DefaultCellView(game, X_MAX, 0), TOP_RIGHT)).isFalse();
+            softly.assertThat(isAlive(new DefaultCellView(game, X_MAX, Y_MAX), BOTTOM_RIGHT)).isFalse();
+            softly.assertThat(isAlive(new DefaultCellView(game, 0, Y_MAX), BOTTOM_LEFT)).isFalse();
         }
     }
 
@@ -126,11 +157,16 @@ public class DefaultCellViewTest {
         });
     }
 
-    private Answer<Boolean> returnsTrueIf(Position targetCell) {
+    private Answer<Boolean> returnsTrueIf(Position targetCell, int x, int y) {
         return invocation -> {
-            int x = invocation.getArgument(0);
-            int y = invocation.getArgument(1);
-            return (x == targetCell.getX()) && (y == targetCell.getY());
+            int currentX = invocation.getArgument(0);
+            int currentY = invocation.getArgument(1);
+            return (currentX == (x + targetCell.getDeltaX())) &&
+                    (currentY == (y + targetCell.getDeltaY()));
         };
+    }
+
+    private boolean isAlive(CellView view, Position position) {
+        return view.isAlive(position.getDeltaX(), position.getDeltaY());
     }
 }

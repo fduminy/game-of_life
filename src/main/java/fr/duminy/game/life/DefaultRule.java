@@ -1,19 +1,18 @@
 package fr.duminy.game.life;
 
-import static fr.duminy.game.life.CellView.Position.CENTER;
-import static fr.duminy.game.life.CellView.Position.values;
-
 public class DefaultRule implements Rule {
     @Override
     public boolean evolve(CellView view) {
         int count = 0;
-        for (CellView.Position position : values()) {
-            if ((position != CENTER) && view.isAlive(position)) {
-                count++;
+        for (int deltaY = -1; deltaY < 2; deltaY++) {
+            for (int deltaX = -1; deltaX < 2; deltaX++) {
+                if (!((deltaX == 0) && (deltaY == 0)) && view.isAlive(deltaX, deltaY)) {
+                    count++;
+                }
             }
         }
 
-        boolean alive = view.isAlive(CENTER);
+        boolean alive = view.isAlive(0, 0);
         if (alive && ((count < 2) || (count > 3))) {
             alive = false;
         } else if (!alive && (count == 3)) {

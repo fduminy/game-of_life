@@ -12,9 +12,9 @@ public class DefaultCellView implements CellView {
     }
 
     @Override
-    public boolean isAlive(Position position) {
-        int targetX = x + position.getX() - 1;
-        int targetY = y + position.getY() - 1;
+    public boolean isAlive(int deltaX, int deltaY) {
+        int targetX = x + deltaX;
+        int targetY = y + deltaY;
         if (outOfBounds(targetX) || outOfBounds(targetY)) {
             return false;
         }
