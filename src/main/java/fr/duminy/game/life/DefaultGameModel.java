@@ -2,7 +2,7 @@ package fr.duminy.game.life;
 
 import java.util.BitSet;
 
-public class DefaultGameModel implements GameModel {
+public class DefaultGameModel implements MutableGameModel {
     private final int size;
     private final BitSet alive;
 

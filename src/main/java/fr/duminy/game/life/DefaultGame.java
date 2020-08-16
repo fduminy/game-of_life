@@ -1,9 +1,9 @@
 package fr.duminy.game.life;
 
 public class DefaultGame implements Game {
-    private final GameModel gameModel;
+    private MutableGameModel gameModel;
 
-    public DefaultGame(GameModel gameModel) {
+    public DefaultGame(MutableGameModel gameModel) {
         this.gameModel = gameModel;
     }
 
@@ -18,12 +18,14 @@ public class DefaultGame implements Game {
     }
 
     @Override
-    public void setAlive(int x, int y, boolean alive) {
-        gameModel.setAlive(x, y, alive);
+    public CellIterator iterator() {
+        return gameModel.iterator();
     }
 
     @Override
-    public CellIterator iterator() {
-        return gameModel.iterator();
+    public MutableGameModel setModel(MutableGameModel gameModel) {
+        MutableGameModel oldModel = this.gameModel;
+        this.gameModel = gameModel;
+        return oldModel;
     }
 }

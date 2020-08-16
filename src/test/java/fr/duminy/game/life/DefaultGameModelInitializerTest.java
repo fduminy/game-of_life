@@ -13,19 +13,19 @@ import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.Mockito.inOrder;
 
 @ExtendWith(MockitoExtension.class)
-class DefaultGameInitializerTest {
+class DefaultGameModelInitializerTest {
     @Test
-    void initialize(@Mock Game game) {
-        DefaultGameInitializer initializer = new DefaultGameInitializer();
-        CellIterator cellIterator = stubCellIterator(game);
+    void initialize(@Mock Game game, @Mock MutableGameModel gameModel) {
+        DefaultGameModelInitializer initializer = new DefaultGameModelInitializer();
+        CellIterator cellIterator = stubCellIterator(gameModel);
 
-        initializer.initialize(game);
+        initializer.initialize(gameModel);
 
-        InOrder inOrder = inOrder(game, cellIterator);
-        inOrder.verify(game).iterator();
+        InOrder inOrder = inOrder(gameModel, cellIterator);
+        inOrder.verify(gameModel).iterator();
         inOrder.verify(cellIterator).hasNext();
         for (int i = 0; i < NUMBER_OF_CELLS; i++) {
-            inOrder.verify(game).setAlive(anyInt(), anyInt(), anyBoolean());
+            inOrder.verify(gameModel).setAlive(anyInt(), anyInt(), anyBoolean());
             inOrder.verify(cellIterator).next();
             inOrder.verify(cellIterator).hasNext();
         }

@@ -1,12 +1,14 @@
 package fr.duminy.game.life;
 
+import java.util.function.Supplier;
+
 public class DefaultGameEvolution implements GameEvolution {
     private final Game game;
-    private final GameModel gameModel;
+    private MutableGameModel gameModel;
 
-    public DefaultGameEvolution(Game game) {
+    public DefaultGameEvolution(Game game, Supplier<MutableGameModel> gameModelSupplier) {
         this.game = game;
-        this.gameModel = new DefaultGameModel(game.getSize());
+        this.gameModel = gameModelSupplier.get();
     }
 
     @Override
@@ -16,8 +18,6 @@ public class DefaultGameEvolution implements GameEvolution {
 
     @Override
     public void update() {
-        for (CellIterator cellIterator = gameModel.iterator(); cellIterator.hasNext(); cellIterator.next()) {
-            game.setAlive(cellIterator.getX(), cellIterator.getY(), cellIterator.isAlive());
-        }
+        gameModel = game.setModel(gameModel);
     }
 }

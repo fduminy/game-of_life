@@ -14,12 +14,15 @@ import static fr.duminy.game.life.Mocks.stubCellIterator;
 import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.inOrder;
+import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 class DefaultGameChangerTest {
     public static final int NUMBER_OF_CELLS = GAME_SIZE * GAME_SIZE;
 
+    @Mock
+    private MutableGameModel gameModel;
     @Mock
     private Game game;
     @Mock
@@ -34,7 +37,8 @@ class DefaultGameChangerTest {
     @ParameterizedTest(name = "cell isAlive={0} after")
     @ValueSource(booleans = {true, false})
     void evolve(boolean cellIsAliveAfter) {
-        CellIterator cellIterator = stubCellIterator(game);
+        CellIterator cellIterator = spy(stubCellIterator(0, 0));
+        when(game.iterator()).thenReturn(cellIterator);
         when(cellViewSupplier.apply(cellIterator)).thenReturn(cellView);
         when(rule.evolve(cellView)).thenReturn(cellIsAliveAfter);
 

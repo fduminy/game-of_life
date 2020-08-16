@@ -13,6 +13,7 @@ public class DefaultGameLoop implements GameLoop {
     static final Duration DELAY = seconds(1);
 
     private final Game game;
+    private final MutableGameModel gameModel;
     private final GameViewer gameViewer;
     private final DefaultGameChanger gameChanger;
     private final GameEvolution gameEvolution;
@@ -20,19 +21,20 @@ public class DefaultGameLoop implements GameLoop {
     private final Function<CellIterator, CellView> cellViewSupplier;
     private final AtomicReference<GameLoopThread> gameLoopThread = new AtomicReference<>();
     private final Sleeper sleeper;
-    private final GameInitializer gameInitializer;
+    private final GameModelInitializer gameModelInitializer;
 
-    public DefaultGameLoop(Game game, Function<GameLoop, GameViewer> gameViewer, DefaultGameChanger gameChanger,
+    public DefaultGameLoop(Game game, MutableGameModel gameModel, Function<GameLoop, GameViewer> gameViewer, DefaultGameChanger gameChanger,
                            GameEvolution gameEvolution, Rule rule, Function<CellIterator, CellView> cellViewSupplier,
-                           Sleeper sleeper, GameInitializer gameInitializer) {
+                           Sleeper sleeper, GameModelInitializer gameModelInitializer) {
         this.game = game;
+        this.gameModel = gameModel;
         this.gameViewer = gameViewer.apply(this);
         this.gameChanger = gameChanger;
         this.gameEvolution = gameEvolution;
         this.rule = rule;
         this.cellViewSupplier = cellViewSupplier;
         this.sleeper = sleeper;
-        this.gameInitializer = gameInitializer;
+        this.gameModelInitializer = gameModelInitializer;
     }
 
     @Override
@@ -66,7 +68,7 @@ public class DefaultGameLoop implements GameLoop {
 
         @Override
         public void run() {
-            gameInitializer.initialize(game);
+            gameModelInitializer.initialize(gameModel);
             gameViewer.view(game);
 
             while (!stop.get()) {

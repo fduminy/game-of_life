@@ -23,9 +23,9 @@ public class Mocks {
         mock(game, cellIterator, 0, 0);
     }
 
-    static CellIterator stubCellIterator(Game game) {
+    static CellIterator stubCellIterator(MutableGameModel gameModel) {
         CellIterator cellIterator = spy(stubCellIterator(0, 0));
-        when(game.iterator()).thenReturn(cellIterator);
+        when(gameModel.iterator()).thenReturn(cellIterator);
         return cellIterator;
     }
 

@@ -4,6 +4,7 @@ import com.google.code.tempusfugit.temporal.Sleeper;
 import com.google.code.tempusfugit.temporal.ThreadSleep;
 
 import java.util.function.Function;
+import java.util.function.Supplier;
 
 import static com.google.code.tempusfugit.temporal.Duration.millis;
 import static java.lang.Thread.sleep;
@@ -19,16 +20,17 @@ public class GameOfLife {
     private final GameLoop gameLoop;
 
     GameOfLife() {
-        GameModel gameModel = new DefaultGameModel(1000);
+        Supplier<MutableGameModel> gameModelSupplier = () -> new DefaultGameModel(1000);
+        MutableGameModel gameModel = gameModelSupplier.get();
         Game game = new DefaultGame(gameModel);
         DefaultGameChanger gameChanger = new DefaultGameChanger();
-        GameEvolution gameEvolution = new DefaultGameEvolution(game);
+        GameEvolution gameEvolution = new DefaultGameEvolution(game, gameModelSupplier);
         Rule rule = new DefaultRule();
         Function<CellIterator, CellView> cellViewSupplier = new DefaultCellViewSupplier(game);
         Sleeper sleeper = new ThreadSleep(millis(40));
-        GameInitializer gameInitializer = new DefaultGameInitializer();
+        GameModelInitializer gameModelInitializer = new DefaultGameModelInitializer();
 
-        gameLoop = new DefaultGameLoop(game, DefaultGameViewer::new, gameChanger, gameEvolution, rule, cellViewSupplier, sleeper, gameInitializer);
+        gameLoop = new DefaultGameLoop(game, gameModel, DefaultGameViewer::new, gameChanger, gameEvolution, rule, cellViewSupplier, sleeper, gameModelInitializer);
     }
 
     void start() throws InterruptedException {

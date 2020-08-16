@@ -13,6 +13,7 @@ import static fr.duminy.game.life.DefaultGameChangerTest.NUMBER_OF_CELLS;
 import static fr.duminy.game.life.Mocks.stubCellIterator;
 import static java.awt.event.WindowEvent.WINDOW_CLOSING;
 import static org.mockito.Mockito.inOrder;
+import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
@@ -20,12 +21,15 @@ class DefaultGameViewerTest {
     @Mock
     private Game game;
     @Mock
+    private MutableGameModel gameModel;
+    @Mock
     private GameLoop gameLoop;
 
     @Test
     void view() {
         when(game.getSize()).thenReturn(GAME_SIZE);
-        CellIterator cellIterator = stubCellIterator(game);
+        CellIterator cellIterator = spy(stubCellIterator(0, 0));
+        when(game.iterator()).thenReturn(cellIterator);
         DefaultGameViewer gameViewer = new DefaultGameViewer(gameLoop);
 
         gameViewer.view(game);
