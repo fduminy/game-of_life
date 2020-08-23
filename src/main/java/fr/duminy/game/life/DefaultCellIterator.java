@@ -2,10 +2,10 @@ package fr.duminy.game.life;
 
 public class DefaultCellIterator implements CellIterator {
     private final GameModel game;
+    private final int numberOfCells;
     private int index;
     private int x;
     private int y;
-    private int numberOfCells;
 
     public DefaultCellIterator(GameModel game) {
         this.game = game;

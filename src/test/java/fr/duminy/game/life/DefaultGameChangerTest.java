@@ -22,8 +22,6 @@ class DefaultGameChangerTest {
     public static final int NUMBER_OF_CELLS = GAME_SIZE * GAME_SIZE;
 
     @Mock
-    private MutableGameModel gameModel;
-    @Mock
     private Game game;
     @Mock
     private GameEvolution gameEvolution;

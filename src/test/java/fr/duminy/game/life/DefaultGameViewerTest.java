@@ -21,8 +21,6 @@ class DefaultGameViewerTest {
     @Mock
     private Game game;
     @Mock
-    private MutableGameModel gameModel;
-    @Mock
     private GameLoop gameLoop;
     @Mock
     private GameStatistics gameStatistics;

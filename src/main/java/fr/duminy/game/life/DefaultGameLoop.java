@@ -1,19 +1,15 @@
 package fr.duminy.game.life;
 
-import com.google.code.tempusfugit.temporal.Duration;
 import com.google.code.tempusfugit.temporal.Sleeper;
 
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Function;
 
-import static com.google.code.tempusfugit.temporal.Duration.seconds;
 import static java.lang.System.nanoTime;
 import static java.time.Duration.ofNanos;
 
 public class DefaultGameLoop implements GameLoop {
-    static final Duration DELAY = seconds(1);
-
     private final Game game;
     private final MutableGameModel gameModel;
     private final GameViewer gameViewer;
