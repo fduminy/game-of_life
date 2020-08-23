@@ -8,6 +8,8 @@ import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Function;
 
 import static com.google.code.tempusfugit.temporal.Duration.seconds;
+import static java.lang.System.nanoTime;
+import static java.time.Duration.ofNanos;
 
 public class DefaultGameLoop implements GameLoop {
     static final Duration DELAY = seconds(1);
@@ -22,10 +24,11 @@ public class DefaultGameLoop implements GameLoop {
     private final AtomicReference<GameLoopThread> gameLoopThread = new AtomicReference<>();
     private final Sleeper sleeper;
     private final GameModelInitializer gameModelInitializer;
+    private final GameStatistics gameStatistics;
 
     public DefaultGameLoop(Game game, MutableGameModel gameModel, Function<GameLoop, GameViewer> gameViewer, DefaultGameChanger gameChanger,
                            GameEvolution gameEvolution, Rule rule, Function<CellIterator, CellView> cellViewSupplier,
-                           Sleeper sleeper, GameModelInitializer gameModelInitializer) {
+                           Sleeper sleeper, GameModelInitializer gameModelInitializer, GameStatistics gameStatistics) {
         this.game = game;
         this.gameModel = gameModel;
         this.gameViewer = gameViewer.apply(this);
@@ -35,6 +38,7 @@ public class DefaultGameLoop implements GameLoop {
         this.cellViewSupplier = cellViewSupplier;
         this.sleeper = sleeper;
         this.gameModelInitializer = gameModelInitializer;
+        this.gameStatistics = gameStatistics;
     }
 
     @Override
@@ -68,8 +72,10 @@ public class DefaultGameLoop implements GameLoop {
 
         @Override
         public void run() {
-            gameModelInitializer.initialize(gameModel);
-            gameViewer.view(game);
+            generate(gameStatistics, () -> {
+                gameModelInitializer.initialize(gameModel);
+                gameViewer.view(game);
+            });
 
             while (!stop.get()) {
                 try {
@@ -77,9 +83,22 @@ public class DefaultGameLoop implements GameLoop {
                 } catch (InterruptedException e) {
                     throw new RuntimeException(e);
                 }
-                gameChanger.evolve(game, gameEvolution, cellViewSupplier, rule);
-                gameEvolution.update();
-                gameViewer.view(game);
+                generate(gameStatistics, () -> {
+                    gameChanger.evolve(game, gameEvolution, cellViewSupplier, rule);
+                    gameEvolution.update();
+                    gameViewer.view(game);
+                });
+            }
+        }
+
+        private void generate(GameStatistics statistics, Runnable runnable) {
+            long start = nanoTime();
+            long end = start;
+            try {
+                runnable.run();
+                end = nanoTime();
+            } finally {
+                statistics.addGeneration(ofNanos(end - start));
             }
         }
 

@@ -29,8 +29,9 @@ public class GameOfLife {
         Function<CellIterator, CellView> cellViewSupplier = new DefaultCellViewSupplier(game);
         Sleeper sleeper = new ThreadSleep(millis(40));
         GameModelInitializer gameModelInitializer = new DefaultGameModelInitializer();
+        GameStatistics gameStatistics = new DefaultGameStatistics();
 
-        gameLoop = new DefaultGameLoop(game, gameModel, DefaultGameViewer::new, gameChanger, gameEvolution, rule, cellViewSupplier, sleeper, gameModelInitializer);
+        gameLoop = new DefaultGameLoop(game, gameModel, g -> new DefaultGameViewer(g, gameStatistics), gameChanger, gameEvolution, rule, cellViewSupplier, sleeper, gameModelInitializer, gameStatistics);
     }
 
     void start() throws InterruptedException {

@@ -24,17 +24,19 @@ class DefaultGameViewerTest {
     private MutableGameModel gameModel;
     @Mock
     private GameLoop gameLoop;
+    @Mock
+    private GameStatistics gameStatistics;
 
     @Test
     void view() {
         when(game.getSize()).thenReturn(GAME_SIZE);
         CellIterator cellIterator = spy(stubCellIterator(0, 0));
         when(game.iterator()).thenReturn(cellIterator);
-        DefaultGameViewer gameViewer = new DefaultGameViewer(gameLoop);
+        DefaultGameViewer gameViewer = new DefaultGameViewer(gameLoop, gameStatistics);
 
         gameViewer.view(game);
 
-        InOrder inOrder = inOrder(game, gameLoop, cellIterator);
+        InOrder inOrder = inOrder(game, gameLoop, cellIterator, gameStatistics);
         inOrder.verify(game).iterator();
         inOrder.verify(cellIterator).hasNext();
         for (int i = 0; i < NUMBER_OF_CELLS; i++) {
@@ -44,6 +46,7 @@ class DefaultGameViewerTest {
             inOrder.verify(cellIterator).next();
             inOrder.verify(cellIterator).hasNext();
         }
+        inOrder.verify(gameStatistics).getStringToView();
         gameViewer.window.dispatchEvent(new WindowEvent(gameViewer.window, WINDOW_CLOSING));
         inOrder.verify(gameLoop).stop();
         inOrder.verifyNoMoreInteractions();

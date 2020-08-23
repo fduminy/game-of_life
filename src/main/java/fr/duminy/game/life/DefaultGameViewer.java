@@ -1,10 +1,13 @@
 package fr.duminy.game.life;
 
 import javax.swing.*;
+import java.awt.*;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.awt.image.BufferedImage;
 
+import static java.awt.BorderLayout.CENTER;
+import static java.awt.BorderLayout.SOUTH;
 import static java.awt.Color.BLACK;
 import static java.awt.Color.WHITE;
 import static java.awt.image.BufferedImage.TYPE_BYTE_GRAY;
@@ -13,11 +16,14 @@ import static javax.swing.WindowConstants.DISPOSE_ON_CLOSE;
 public class DefaultGameViewer implements GameViewer {
     JFrame window;
     private final GameLoop gameLoop;
-    private JLabel label;
+    private final GameStatistics gameStatistics;
+    private JLabel gameView;
+    private JLabel statisticsView;
     private BufferedImage image;
 
-    public DefaultGameViewer(GameLoop gameLoop) {
+    public DefaultGameViewer(GameLoop gameLoop, GameStatistics gameStatistics) {
         this.gameLoop = gameLoop;
+        this.gameStatistics = gameStatistics;
     }
 
     @Override
@@ -28,7 +34,8 @@ public class DefaultGameViewer implements GameViewer {
             boolean alive = cellIterator.isAlive();
             image.setRGB(cellIterator.getX(), cellIterator.getY(), alive ? WHITE.getRGB() : BLACK.getRGB());
         }
-        label.repaint();
+        this.gameView.repaint();
+        statisticsView.setText(gameStatistics.getStringToView());
     }
 
     private void initViewIfNotDone(int gameSize) {
@@ -37,11 +44,18 @@ public class DefaultGameViewer implements GameViewer {
         }
 
         image = new BufferedImage(gameSize, gameSize, TYPE_BYTE_GRAY);
-
         ImageIcon imageIcon = new ImageIcon(image);
-        label = new JLabel(imageIcon);
+        gameView = new JLabel(imageIcon);
+
+        statisticsView = new JLabel();
+        statisticsView.setText(gameStatistics.getStringToView());
+
+        JPanel view = new JPanel(new BorderLayout());
+        view.add(gameView, CENTER);
+        view.add(statisticsView, SOUTH);
+
         window = new JFrame("Game of life");
-        window.setContentPane(label);
+        window.setContentPane(view);
         window.pack();
         window.setSize(window.getPreferredSize());
         window.setDefaultCloseOperation(DISPOSE_ON_CLOSE);

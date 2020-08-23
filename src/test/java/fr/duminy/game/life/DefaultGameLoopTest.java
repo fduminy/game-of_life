@@ -18,6 +18,7 @@ import static com.google.code.tempusfugit.temporal.Duration.seconds;
 import static com.google.code.tempusfugit.temporal.Timeout.timeout;
 import static com.google.code.tempusfugit.temporal.WaitFor.waitOrTimeout;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doAnswer;
 
 @ExtendWith({MockitoExtension.class, SoftAssertionsExtension.class})
@@ -40,10 +41,13 @@ class DefaultGameLoopTest {
     private Sleeper sleeper;
     @Mock
     private GameModelInitializer gameModelInitializer;
+    @Mock
+    private GameStatistics gameStatistics;
 
     @Test
     void start() throws InterruptedException, TimeoutException {
-        GameLoop gameLoop = new DefaultGameLoop(game, gameModel, loop -> gameViewer, gameChanger, gameEvolution, rule, cellViewSupplier, sleeper, gameModelInitializer);
+        GameLoop gameLoop = new DefaultGameLoop(game, gameModel, loop -> gameViewer, gameChanger, gameEvolution, rule,
+                cellViewSupplier, sleeper, gameModelInitializer, gameStatistics);
         int maxIterations = 3;
         List<String> events = new ArrayList<>();
         doAnswer(a -> events.add("init")).when(gameModelInitializer).initialize(gameModel);
@@ -61,17 +65,18 @@ class DefaultGameLoopTest {
         }).when(sleeper).sleep();
         doAnswer(a -> events.add("evolve")).when(gameChanger).evolve(game, gameEvolution, cellViewSupplier, rule);
         doAnswer(a -> events.add("update")).when(gameEvolution).update();
+        doAnswer(a -> events.add("stats")).when(gameStatistics).addGeneration(any());
 
         gameLoop.start();
         waitOrTimeout(() -> sleepCount.get() >= maxIterations, timeout(seconds(1)));
         gameLoop.stop();
 
-        assertThat(events).containsExactly("init", "view", "sleep", "evolve", "update", "view", "sleep", "evolve", "update", "view", "sleep");
+        assertThat(events).containsExactly("init", "view", "stats", "sleep", "evolve", "update", "view", "stats", "sleep", "evolve", "update", "view", "stats", "sleep");
     }
 
     @Test
     void isRunning(SoftAssertions softly) {
-        GameLoop gameLoop = new DefaultGameLoop(game, gameModel, loop -> gameViewer, gameChanger, gameEvolution, rule, cellViewSupplier, sleeper, gameModelInitializer);
+        GameLoop gameLoop = new DefaultGameLoop(game, gameModel, loop -> gameViewer, gameChanger, gameEvolution, rule, cellViewSupplier, sleeper, gameModelInitializer, gameStatistics);
         softly.assertThat(gameLoop.isRunning()).isFalse();
 
         gameLoop.start();
