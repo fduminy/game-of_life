@@ -1,5 +1,8 @@
 package fr.duminy.game.life;
 
+import net.jqwik.api.ForAll;
+import net.jqwik.api.Property;
+import net.jqwik.api.constraints.IntRange;
 import org.assertj.core.api.SoftAssertions;
 import org.assertj.core.api.junit.jupiter.SoftAssertionsExtension;
 import org.junit.jupiter.api.DisplayName;
@@ -21,6 +24,7 @@ import static fr.duminy.game.life.DefaultCellViewTest.Position.TOP;
 import static fr.duminy.game.life.DefaultCellViewTest.Position.TOP_LEFT;
 import static fr.duminy.game.life.DefaultCellViewTest.Position.TOP_RIGHT;
 import static fr.duminy.game.life.DefaultCellViewTest.Position.values;
+import static fr.duminy.game.life.Mocks.mockCellIterator;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.Mockito.mock;
@@ -40,7 +44,7 @@ public class DefaultCellViewTest {
     void isAlive_should_return_false_when_no_cell_is_alive(Position targetCell) {
         when(game.isAlive(anyInt(), anyInt())).thenReturn(false);
         when(game.getSize()).thenReturn(GAME_SIZE);
-        CellView view = new DefaultCellView(game, 1, 1);
+        CellView view = newDefaultCellView(game, 1, 1);
         assertThat(isAlive(view, targetCell)).as("at targetCell %s", targetCell).isFalse();
     }
 
@@ -49,7 +53,7 @@ public class DefaultCellViewTest {
     void isAlive_should_return_true_when_all_cells_are_alive(Position targetCell) {
         when(game.isAlive(anyInt(), anyInt())).thenReturn(true);
         when(game.getSize()).thenReturn(GAME_SIZE);
-        CellView view = new DefaultCellView(game, 1, 1);
+        CellView view = newDefaultCellView(game, 1, 1);
         assertThat(isAlive(view, targetCell)).as("at targetCell %s", targetCell).isTrue();
     }
 
@@ -60,9 +64,27 @@ public class DefaultCellViewTest {
         int y = 1;
         when(game.isAlive(anyInt(), anyInt())).then(returnsTrueIf(targetCell, x, y));
         when(game.getSize()).thenReturn(GAME_SIZE);
-        CellView view = new DefaultCellView(game, x, y);
+        CellView view = newDefaultCellView(game, x, y);
         for (Position testedCell : values()) {
             softly.assertThat(isAlive(view, testedCell)).as("at testedCell %s", testedCell).isEqualTo(targetCell == testedCell);
+        }
+    }
+
+    @Property
+    void setLocation(@ForAll @IntRange(max = GAME_SIZE - 1) int x, @ForAll @IntRange(max = GAME_SIZE - 1) int y) {
+        Game game = mock(Game.class);
+        when(game.getSize()).thenReturn(GAME_SIZE);
+        when(game.iterator()).then(answer -> mockCellIterator());
+        when(game.isAlive(x, y)).thenReturn(true);
+        DefaultCellView cellView = newDefaultCellView(game, x, y);
+
+        for (Position testedCell : values()) {
+            int deltaX = testedCell.getDeltaX();
+            int deltaY = testedCell.getDeltaY();
+            boolean shouldBeAlive = (deltaX == 0) && (deltaY == 0);
+            assertThat(cellView.isAlive(deltaX, deltaY))
+                    .as("x=%d, y=%d, deltaX=%d, deltaY=%d", x, y, deltaX, deltaY)
+                    .isEqualTo(shouldBeAlive);
         }
     }
 
@@ -105,7 +127,8 @@ public class DefaultCellViewTest {
         void on_left_side() {
             Game game = gameWithAllCellsAlive();
             for (int y = 0; y < GAME_SIZE; y++) {
-                CellView view = new DefaultCellView(game, 0, y);
+                CellView view = newDefaultCellView(game, 0, y);
+                view.setLocation(0, y);
                 softly.assertThat(isAlive(view, LEFT)).as("y=%d", y).isFalse();
             }
         }
@@ -114,7 +137,7 @@ public class DefaultCellViewTest {
         void on_right_side(SoftAssertions softly) {
             Game game = gameWithAllCellsAlive();
             for (int y = 0; y < GAME_SIZE; y++) {
-                CellView view = new DefaultCellView(game, X_MAX, y);
+                CellView view = newDefaultCellView(game, X_MAX, y);
                 softly.assertThat(isAlive(view, RIGHT)).as("y=%d", y).isFalse();
             }
         }
@@ -123,7 +146,7 @@ public class DefaultCellViewTest {
         void on_top_side(SoftAssertions softly) {
             Game game = gameWithAllCellsAlive();
             for (int x = 0; x < GAME_SIZE; x++) {
-                CellView view = new DefaultCellView(game, x, 0);
+                CellView view = newDefaultCellView(game, x, 0);
                 softly.assertThat(isAlive(view, TOP)).as("x=%d", x).isFalse();
             }
         }
@@ -132,7 +155,7 @@ public class DefaultCellViewTest {
         void on_bottom_side(SoftAssertions softly) {
             Game game = gameWithAllCellsAlive();
             for (int x = 0; x < GAME_SIZE; x++) {
-                CellView view = new DefaultCellView(game, x, Y_MAX);
+                CellView view = newDefaultCellView(game, x, Y_MAX);
                 softly.assertThat(isAlive(view, BOTTOM)).as("x=%d", x).isFalse();
             }
         }
@@ -140,11 +163,17 @@ public class DefaultCellViewTest {
         @Test
         void on_corner_side(SoftAssertions softly) {
             Game game = gameWithAllCellsAlive();
-            softly.assertThat(isAlive(new DefaultCellView(game, 0, 0), TOP_LEFT)).isFalse();
-            softly.assertThat(isAlive(new DefaultCellView(game, X_MAX, 0), TOP_RIGHT)).isFalse();
-            softly.assertThat(isAlive(new DefaultCellView(game, X_MAX, Y_MAX), BOTTOM_RIGHT)).isFalse();
-            softly.assertThat(isAlive(new DefaultCellView(game, 0, Y_MAX), BOTTOM_LEFT)).isFalse();
+            softly.assertThat(isAlive(newDefaultCellView(game, 0, 0), TOP_LEFT)).isFalse();
+            softly.assertThat(isAlive(newDefaultCellView(game, X_MAX, 0), TOP_RIGHT)).isFalse();
+            softly.assertThat(isAlive(newDefaultCellView(game, X_MAX, Y_MAX), BOTTOM_RIGHT)).isFalse();
+            softly.assertThat(isAlive(newDefaultCellView(game, 0, Y_MAX), BOTTOM_LEFT)).isFalse();
         }
+    }
+
+    private DefaultCellView newDefaultCellView(Game game, int x, int yMax) {
+        DefaultCellView view = new DefaultCellView(game);
+        view.setLocation(x, yMax);
+        return view;
     }
 
     // hack to avoid mockito stubbing failure due to unnecessary stubbing

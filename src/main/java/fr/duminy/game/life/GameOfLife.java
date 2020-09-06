@@ -26,7 +26,7 @@ public class GameOfLife {
         DefaultGameChanger gameChanger = new DefaultGameChanger();
         GameEvolution gameEvolution = new DefaultGameEvolution(game, gameModelSupplier);
         Rule rule = new DefaultRule();
-        Function<CellIterator, CellView> cellViewSupplier = new DefaultCellViewSupplier(game);
+        Function<CellIterator, CellView> cellViewSupplier = new DefaultCellViewSupplier(game, DefaultCellView::new);
         Sleeper sleeper = new ThreadSleep(millis(40));
         GameModelInitializer gameModelInitializer = new DefaultGameModelInitializer();
         GameStatistics gameStatistics = new DefaultGameStatistics();

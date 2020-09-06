@@ -2,11 +2,15 @@ package fr.duminy.game.life;
 
 public class DefaultCellView implements CellView {
     private final Game game;
-    private final int x;
-    private final int y;
+    private int x;
+    private int y;
 
-    public DefaultCellView(Game game, int x, int y) {
+    public DefaultCellView(Game game) {
         this.game = game;
+    }
+
+    @Override
+    public void setLocation(int x, int y) {
         this.x = x;
         this.y = y;
     }
