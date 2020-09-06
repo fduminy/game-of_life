@@ -16,14 +16,14 @@ public class DefaultGameLoop implements GameLoop {
     private final GameChanger gameChanger;
     private final GameEvolution gameEvolution;
     private final Rule rule;
-    private final Function<CellIterator, CellView> cellViewSupplier;
+    private final CellViewSupplier cellViewSupplier;
     private final AtomicReference<GameLoopThread> gameLoopThread = new AtomicReference<>();
     private final Sleeper sleeper;
     private final GameModelInitializer gameModelInitializer;
     private final GameStatistics gameStatistics;
 
     public DefaultGameLoop(Game game, MutableGameModel gameModel, Function<GameLoop, GameViewer> gameViewer, DefaultGameChanger gameChanger,
-                           GameEvolution gameEvolution, Rule rule, Function<CellIterator, CellView> cellViewSupplier,
+                           GameEvolution gameEvolution, Rule rule, CellViewSupplier cellViewSupplier,
                            Sleeper sleeper, GameModelInitializer gameModelInitializer, GameStatistics gameStatistics) {
         this.game = game;
         this.gameModel = gameModel;

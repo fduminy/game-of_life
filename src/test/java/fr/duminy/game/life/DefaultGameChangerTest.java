@@ -7,8 +7,6 @@ import org.mockito.InOrder;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import java.util.function.Function;
-
 import static fr.duminy.game.life.DefaultCellViewTest.GAME_SIZE;
 import static fr.duminy.game.life.Mocks.stubCellIterator;
 import static org.mockito.ArgumentMatchers.anyInt;
@@ -26,7 +24,7 @@ class DefaultGameChangerTest {
     @Mock
     private GameEvolution gameEvolution;
     @Mock
-    private Function<CellIterator, CellView> cellViewSupplier;
+    private CellViewSupplier cellViewSupplier;
     @Mock
     private CellView cellView;
     @Mock

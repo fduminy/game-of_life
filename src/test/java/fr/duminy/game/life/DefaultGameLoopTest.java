@@ -12,7 +12,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.TimeoutException;
 import java.util.concurrent.atomic.AtomicInteger;
-import java.util.function.Function;
 
 import static com.google.code.tempusfugit.temporal.Duration.seconds;
 import static com.google.code.tempusfugit.temporal.Timeout.timeout;
@@ -36,7 +35,7 @@ class DefaultGameLoopTest {
     @Mock
     private Rule rule;
     @Mock
-    private Function<CellIterator, CellView> cellViewSupplier;
+    private CellViewSupplier cellViewSupplier;
     @Mock
     private Sleeper sleeper;
     @Mock

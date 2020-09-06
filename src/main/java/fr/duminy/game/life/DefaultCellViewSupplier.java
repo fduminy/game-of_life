@@ -2,7 +2,7 @@ package fr.duminy.game.life;
 
 import java.util.function.Function;
 
-public class DefaultCellViewSupplier implements Function<CellIterator, CellView> {
+public class DefaultCellViewSupplier implements CellViewSupplier {
     private final CellView cellView;
 
     public DefaultCellViewSupplier(Game game, Function<Game, CellView> cellViewSupplier) {
