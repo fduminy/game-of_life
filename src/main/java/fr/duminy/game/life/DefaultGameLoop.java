@@ -13,7 +13,7 @@ public class DefaultGameLoop implements GameLoop {
     private final Game game;
     private final MutableGameModel gameModel;
     private final GameViewer gameViewer;
-    private final DefaultGameChanger gameChanger;
+    private final GameChanger gameChanger;
     private final GameEvolution gameEvolution;
     private final Rule rule;
     private final Function<CellIterator, CellView> cellViewSupplier;
