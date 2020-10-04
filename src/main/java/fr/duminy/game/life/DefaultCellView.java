@@ -1,12 +1,12 @@
 package fr.duminy.game.life;
 
 public class DefaultCellView implements CellView {
-    private final Game game;
+    private final GameModel model;
     private int x;
     private int y;
 
-    public DefaultCellView(Game game) {
-        this.game = game;
+    public DefaultCellView(GameModel model) {
+        this.model = model;
     }
 
     @Override
@@ -22,10 +22,10 @@ public class DefaultCellView implements CellView {
         if (outOfBounds(targetX) || outOfBounds(targetY)) {
             return false;
         }
-        return game.isAlive(targetX, targetY);
+        return model.isAlive(targetX, targetY);
     }
 
     private boolean outOfBounds(int coordinate) {
-        return (coordinate < 0) || (coordinate >= game.getSize());
+        return (coordinate < 0) || (coordinate >= model.getSize());
     }
 }
