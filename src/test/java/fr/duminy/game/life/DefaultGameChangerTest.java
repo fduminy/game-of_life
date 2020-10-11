@@ -24,8 +24,6 @@ class DefaultGameChangerTest {
     @Mock
     private GameEvolution gameEvolution;
     @Mock
-    private CellViewSupplier cellViewSupplier;
-    @Mock
     private CellView cellView;
     @Mock
     private Rule rule;
@@ -33,18 +31,16 @@ class DefaultGameChangerTest {
     @ParameterizedTest(name = "cell isAlive={0} after")
     @ValueSource(booleans = {true, false})
     void evolve(boolean cellIsAliveAfter) {
-        CellIterator cellIterator = spy(stubCellIterator(0, 0));
+        CellIterator cellIterator = spy(stubCellIterator(0, 0, cellView));
         when(game.iterator()).thenReturn(cellIterator);
-        when(cellViewSupplier.apply(cellIterator)).thenReturn(cellView);
         when(rule.evolve(cellView)).thenReturn(cellIsAliveAfter);
 
-        new DefaultGameChanger().evolve(game, gameEvolution, cellViewSupplier, rule);
+        new DefaultGameChanger().evolve(game, gameEvolution, rule);
 
-        InOrder inOrder = inOrder(game, gameEvolution, cellViewSupplier, cellView, rule, cellIterator);
+        InOrder inOrder = inOrder(game, gameEvolution, cellView, rule, cellIterator);
         inOrder.verify(game).iterator();
         inOrder.verify(cellIterator).hasNext();
         for (int i = 0; i < NUMBER_OF_CELLS; i++) {
-            inOrder.verify(cellViewSupplier).apply(cellIterator);
             inOrder.verify(rule).evolve(cellView);
             inOrder.verify(gameEvolution).setAlive(anyInt(), anyInt(), eq(cellIsAliveAfter));
             inOrder.verify(cellIterator).next();

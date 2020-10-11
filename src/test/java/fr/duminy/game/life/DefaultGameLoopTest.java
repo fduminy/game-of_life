@@ -35,8 +35,6 @@ class DefaultGameLoopTest {
     @Mock
     private Rule rule;
     @Mock
-    private CellViewSupplier cellViewSupplier;
-    @Mock
     private Sleeper sleeper;
     @Mock
     private GameModelInitializer gameModelInitializer;
@@ -46,7 +44,7 @@ class DefaultGameLoopTest {
     @Test
     void start() throws InterruptedException, TimeoutException {
         GameLoop gameLoop = new DefaultGameLoop(game, gameModel, loop -> gameViewer, gameChanger, gameEvolution, rule,
-                cellViewSupplier, sleeper, gameModelInitializer, gameStatistics);
+                sleeper, gameModelInitializer, gameStatistics);
         int maxIterations = 3;
         List<String> events = new ArrayList<>();
         doAnswer(a -> events.add("init")).when(gameModelInitializer).initialize(gameModel);
@@ -62,7 +60,7 @@ class DefaultGameLoopTest {
             }
             return null;
         }).when(sleeper).sleep();
-        doAnswer(a -> events.add("evolve")).when(gameChanger).evolve(game, gameEvolution, cellViewSupplier, rule);
+        doAnswer(a -> events.add("evolve")).when(gameChanger).evolve(game, gameEvolution, rule);
         doAnswer(a -> events.add("update")).when(gameEvolution).update();
         doAnswer(a -> events.add("stats")).when(gameStatistics).addGeneration(any());
 
@@ -75,7 +73,7 @@ class DefaultGameLoopTest {
 
     @Test
     void isRunning(SoftAssertions softly) {
-        GameLoop gameLoop = new DefaultGameLoop(game, gameModel, loop -> gameViewer, gameChanger, gameEvolution, rule, cellViewSupplier, sleeper, gameModelInitializer, gameStatistics);
+        GameLoop gameLoop = new DefaultGameLoop(game, gameModel, loop -> gameViewer, gameChanger, gameEvolution, rule, sleeper, gameModelInitializer, gameStatistics);
         softly.assertThat(gameLoop.isRunning()).isFalse();
 
         gameLoop.start();

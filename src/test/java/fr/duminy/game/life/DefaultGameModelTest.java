@@ -1,5 +1,6 @@
 package fr.duminy.game.life;
 
+import fr.duminy.game.life.DefaultGameModel.DefaultCellIterator;
 import net.jqwik.api.ForAll;
 import net.jqwik.api.Property;
 import net.jqwik.api.constraints.IntRange;

@@ -16,14 +16,13 @@ public class DefaultGameLoop implements GameLoop {
     private final GameChanger gameChanger;
     private final GameEvolution gameEvolution;
     private final Rule rule;
-    private final CellViewSupplier cellViewSupplier;
     private final AtomicReference<GameLoopThread> gameLoopThread = new AtomicReference<>();
     private final Sleeper sleeper;
     private final GameModelInitializer gameModelInitializer;
     private final GameStatistics gameStatistics;
 
     public DefaultGameLoop(Game game, MutableGameModel gameModel, Function<GameLoop, GameViewer> gameViewer, DefaultGameChanger gameChanger,
-                           GameEvolution gameEvolution, Rule rule, CellViewSupplier cellViewSupplier,
+                           GameEvolution gameEvolution, Rule rule,
                            Sleeper sleeper, GameModelInitializer gameModelInitializer, GameStatistics gameStatistics) {
         this.game = game;
         this.gameModel = gameModel;
@@ -31,7 +30,6 @@ public class DefaultGameLoop implements GameLoop {
         this.gameChanger = gameChanger;
         this.gameEvolution = gameEvolution;
         this.rule = rule;
-        this.cellViewSupplier = cellViewSupplier;
         this.sleeper = sleeper;
         this.gameModelInitializer = gameModelInitializer;
         this.gameStatistics = gameStatistics;
@@ -80,7 +78,7 @@ public class DefaultGameLoop implements GameLoop {
                     throw new RuntimeException(e);
                 }
                 generate(gameStatistics, () -> {
-                    gameChanger.evolve(game, gameEvolution, cellViewSupplier, rule);
+                    gameChanger.evolve(game, gameEvolution, rule);
                     gameEvolution.update();
                     gameViewer.view(game);
                 });

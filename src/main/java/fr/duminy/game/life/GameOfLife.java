@@ -25,12 +25,11 @@ public class GameOfLife {
         DefaultGameChanger gameChanger = new DefaultGameChanger();
         GameEvolution gameEvolution = new DefaultGameEvolution(game, gameModelSupplier);
         Rule rule = new DefaultRule();
-        CellViewSupplier cellViewSupplier = new DefaultCellViewSupplier(game, DefaultCellView::new);
         Sleeper sleeper = new ThreadSleep(millis(40));
         GameModelInitializer gameModelInitializer = new DefaultGameModelInitializer();
         GameStatistics gameStatistics = new DefaultGameStatistics();
 
-        gameLoop = new DefaultGameLoop(game, gameModel, g -> new DefaultGameViewer(g, gameStatistics), gameChanger, gameEvolution, rule, cellViewSupplier, sleeper, gameModelInitializer, gameStatistics);
+        gameLoop = new DefaultGameLoop(game, gameModel, g -> new DefaultGameViewer(g, gameStatistics), gameChanger, gameEvolution, rule, sleeper, gameModelInitializer, gameStatistics);
     }
 
     void start() throws InterruptedException {

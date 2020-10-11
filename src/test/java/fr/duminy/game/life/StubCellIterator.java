@@ -7,11 +7,17 @@ class StubCellIterator implements CellIterator {
     private int index;
     private int x;
     private int y;
+    private CellView cellView;
 
     public StubCellIterator(int x, int y) {
+        this(x, y, null);
+    }
+
+    public StubCellIterator(int x, int y, CellView cellView) {
         index = x + y * GAME_SIZE;
         this.x = x;
         this.y = y;
+        this.cellView = cellView;
     }
 
     @Override
@@ -47,5 +53,10 @@ class StubCellIterator implements CellIterator {
     @Override
     public int getIndex() {
         return index;
+    }
+
+    @Override
+    public CellView cellView() {
+        return cellView;
     }
 }

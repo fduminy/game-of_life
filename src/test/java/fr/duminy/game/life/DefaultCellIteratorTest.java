@@ -1,5 +1,7 @@
 package fr.duminy.game.life;
 
+import fr.duminy.game.life.DefaultGameModel.DefaultCellIterator;
+import fr.duminy.game.life.DefaultGameModel.DefaultCellView;
 import net.jqwik.api.ForAll;
 import net.jqwik.api.Property;
 import net.jqwik.api.constraints.IntRange;
@@ -54,5 +56,21 @@ class DefaultCellIteratorTest {
             cellIterator.next();
         }
         assertThat(cellIterator.isAlive()).isEqualTo(alive);
+    }
+
+    @Property
+    void cellView(@ForAll @IntRange(max = GAME_SIZE - 1) int x, @ForAll @IntRange(max = GAME_SIZE - 1) int y, @ForAll boolean alive) {
+        Game game = mock(Game.class);
+        when(game.getSize()).thenReturn(GAME_SIZE);
+        when(game.isAlive(x, y)).thenReturn(alive);
+
+        CellIterator cellIterator = new DefaultCellIterator(game);
+        while (!((cellIterator.getX() == x) && (cellIterator.getY() == y))) {
+            cellIterator.next();
+        }
+        CellView cellView = cellIterator.cellView();
+
+        assertThat(cellView).isExactlyInstanceOf(DefaultCellView.class);
+        assertThat(cellView.isAlive(0, 0)).isEqualTo(alive);
     }
 }
