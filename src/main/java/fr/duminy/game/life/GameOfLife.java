@@ -22,14 +22,13 @@ public class GameOfLife {
         Supplier<MutableGameModel> gameModelSupplier = () -> new DefaultGameModel(1000);
         MutableGameModel gameModel = gameModelSupplier.get();
         Game game = new DefaultGame(gameModel);
-        DefaultGameChanger gameChanger = new DefaultGameChanger();
-        GameEvolution gameEvolution = new DefaultGameEvolution(game, gameModelSupplier);
+        DefaultGameChanger gameChanger = new DefaultGameChanger(gameModelSupplier);
         Rule rule = new DefaultRule();
         Sleeper sleeper = new ThreadSleep(millis(40));
         GameModelInitializer gameModelInitializer = new DefaultGameModelInitializer();
         GameStatistics gameStatistics = new DefaultGameStatistics();
 
-        gameLoop = new DefaultGameLoop(game, gameModel, g -> new DefaultGameViewer(g, gameStatistics), gameChanger, gameEvolution, rule, sleeper, gameModelInitializer, gameStatistics);
+        gameLoop = new DefaultGameLoop(game, gameModel, g -> new DefaultGameViewer(g, gameStatistics), gameChanger, rule, sleeper, gameModelInitializer, gameStatistics);
     }
 
     void start() throws InterruptedException {

@@ -43,7 +43,7 @@ class DefaultGameLoopTest {
 
     @Test
     void start() throws InterruptedException, TimeoutException {
-        GameLoop gameLoop = new DefaultGameLoop(game, gameModel, loop -> gameViewer, gameChanger, gameEvolution, rule,
+        GameLoop gameLoop = new DefaultGameLoop(game, gameModel, loop -> gameViewer, gameChanger, rule,
                 sleeper, gameModelInitializer, gameStatistics);
         int maxIterations = 3;
         List<String> events = new ArrayList<>();
@@ -60,20 +60,19 @@ class DefaultGameLoopTest {
             }
             return null;
         }).when(sleeper).sleep();
-        doAnswer(a -> events.add("evolve")).when(gameChanger).evolve(game, gameEvolution, rule);
-        doAnswer(a -> events.add("update")).when(gameEvolution).update();
+        doAnswer(a -> events.add("evolve")).when(gameChanger).evolve(game, rule);
         doAnswer(a -> events.add("stats")).when(gameStatistics).addGeneration(any());
 
         gameLoop.start();
         waitOrTimeout(() -> sleepCount.get() >= maxIterations, timeout(seconds(1)));
         gameLoop.stop();
 
-        assertThat(events).containsExactly("init", "view", "stats", "sleep", "evolve", "update", "view", "stats", "sleep", "evolve", "update", "view", "stats", "sleep");
+        assertThat(events).containsExactly("init", "view", "stats", "sleep", "evolve", "view", "stats", "sleep", "evolve", "view", "stats", "sleep");
     }
 
     @Test
     void isRunning(SoftAssertions softly) {
-        GameLoop gameLoop = new DefaultGameLoop(game, gameModel, loop -> gameViewer, gameChanger, gameEvolution, rule, sleeper, gameModelInitializer, gameStatistics);
+        GameLoop gameLoop = new DefaultGameLoop(game, gameModel, loop -> gameViewer, gameChanger, rule, sleeper, gameModelInitializer, gameStatistics);
         softly.assertThat(gameLoop.isRunning()).isFalse();
 
         gameLoop.start();

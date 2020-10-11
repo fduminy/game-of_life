@@ -34,6 +34,10 @@ public class Mocks {
         mock(cellIterator, x, y);
     }
 
+    public static StubCellIterator stubCellIterator(int x, int y, CellView cellView, int gameSize) {
+        return new StubCellIterator(x, y, cellView, gameSize);
+    }
+
     public static CellIterator stubCellIterator(int x, int y, CellView cellView) {
         return new StubCellIterator(x, y, cellView);
     }
