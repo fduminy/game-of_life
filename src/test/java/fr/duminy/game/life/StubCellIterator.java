@@ -54,11 +54,6 @@ class StubCellIterator implements CellIterator {
     }
 
     @Override
-    public int getIndex() {
-        return index;
-    }
-
-    @Override
     public CellView cellView() {
         return cellView;
     }

@@ -49,7 +49,6 @@ class DefaultGameModelTest {
         if (softly.wasSuccess()) {
             softly.assertThat(cellIterator.getX()).isZero();
             softly.assertThat(cellIterator.getY()).isZero();
-            softly.assertThat(cellIterator.getIndex()).isZero();
         }
     }
 }

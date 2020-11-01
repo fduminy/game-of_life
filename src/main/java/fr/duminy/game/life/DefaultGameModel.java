@@ -86,11 +86,6 @@ public class DefaultGameModel implements MutableGameModel {
         }
 
         @Override
-        public int getIndex() {
-            return index;
-        }
-
-        @Override
         public CellView cellView() {
             DefaultCellView cellView = new DefaultCellView(game);
             cellView.setLocation(x, y);

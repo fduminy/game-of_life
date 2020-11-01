@@ -26,8 +26,8 @@ class DefaultCellIteratorTest {
 
         CellIterator cellIterator = new DefaultCellIterator(game);
 
-        softly.assertThat(cellIterator).extracting(CellIterator::getIndex, CellIterator::getX, CellIterator::getY, CellIterator::hasNext)
-                .containsExactly(0, 0, 0, true);
+        softly.assertThat(cellIterator).extracting(CellIterator::getX, CellIterator::getY, CellIterator::hasNext)
+                .containsExactly(0, 0, true);
     }
 
     @SuppressWarnings("unchecked")
@@ -38,8 +38,8 @@ class DefaultCellIteratorTest {
         CellIterator cellIterator = new DefaultCellIterator(game);
 
         for (CellIterator referenceCellIterator = new StubCellIterator(0, 0); referenceCellIterator.hasNext(); referenceCellIterator.next()) {
-            softly.assertThat(cellIterator).extracting(CellIterator::getIndex, CellIterator::getX, CellIterator::getY, CellIterator::hasNext)
-                    .containsExactly(referenceCellIterator.getIndex(), referenceCellIterator.getX(), referenceCellIterator.getY(), referenceCellIterator.hasNext());
+            softly.assertThat(cellIterator).extracting(CellIterator::getX, CellIterator::getY, CellIterator::hasNext)
+                    .containsExactly(referenceCellIterator.getX(), referenceCellIterator.getY(), referenceCellIterator.hasNext());
             cellIterator.next();
         }
     }

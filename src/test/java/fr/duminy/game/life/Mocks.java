@@ -61,7 +61,6 @@ public class Mocks {
         }).when(cellIterator).next();
         when(cellIterator.getX()).then(answer -> _x[0]);
         when(cellIterator.getY()).then(answer -> _y[0]);
-        when(cellIterator.getIndex()).then(answer -> index[0]);
         when(cellIterator.hasNext()).then(answer -> index[0] < NUMBER_OF_CELLS);
     }
 }

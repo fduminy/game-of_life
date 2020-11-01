@@ -11,7 +11,5 @@ public interface CellIterator {
 
     int getY();
 
-    int getIndex();
-
     CellView cellView();
 }
